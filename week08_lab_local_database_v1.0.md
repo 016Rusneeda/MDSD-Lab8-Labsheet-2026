@@ -55,8 +55,43 @@
 
 บันทึกโค้ดที่ Gemini ตอบกลับมาที่ด้านล่าง
 
-```text
-บันทึกผลลัพธ์ที่นี่
+```
+import 'package:drift/drift.dart';
+
+/// 1. ตารางเก็บรายการสินค้าที่ถูกใจ (Favorites Cache)
+class FavoriteProducts extends Table {
+  // รหัสสินค้าจากระบบหลัก (ใช้เป็น Primary Key โดยตรง)
+  IntColumn get productId => integer()();
+
+  // ข้อมูลแคชสำหรับนำไปแสดงผล UI
+  TextColumn get title => text()();
+  RealColumn get price => real()();
+  TextColumn get imageUrl => text().nullable()();
+
+  // เวลาที่กดถูกใจ เพื่อใช้เรียงลำดับ
+  DateTimeColumn get likedAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {productId};
+}
+
+/// 2. ตารางเก็บร่างประกาศขายสินค้าที่ AI แนะนำ (Draft Listings)
+class DraftListings extends Table {
+  // Primary Key ของร่างประกาศในเครื่อง (Auto Increment)
+  IntColumn get id => integer().autoIncrement()();
+
+  // ข้อมูลเนื้อหาที่ AI สรุปให้ หรือผู้ใช้แก้ไข
+  TextColumn get title => text().nullable()();
+  TextColumn get category => text().nullable()();
+  TextColumn get description => text().nullable()();
+
+  // Path ของรูปภาพที่บันทึกไว้ในเครื่อง
+  TextColumn get localImagePath => text()();
+
+  // เวลาสร้างและเวลาแก้ไขล่าสุด
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().clientDefault(() => DateTime.now())();
+}
 ```
 
 
