@@ -55,44 +55,58 @@
 
 บันทึกโค้ดที่ Gemini ตอบกลับมาที่ด้านล่าง
 
+**ตารางที่ 1: LikedProducts (รายการสินค้าที่กดถูกใจ)**
 ```
 import 'package:drift/drift.dart';
 
-/// 1. ตารางเก็บรายการสินค้าที่ถูกใจ (Favorites Cache)
-class FavoriteProducts extends Table {
-  // รหัสสินค้าจากระบบหลัก (ใช้เป็น Primary Key โดยตรง)
+class LikedProducts extends Table {
+  // รหัสสินค้าจากระบบหลัก (ใช้เป็น Primary Key)
   IntColumn get productId => integer()();
 
-  // ข้อมูลแคชสำหรับนำไปแสดงผล UI
+  // ชื่อสินค้า
   TextColumn get title => text()();
+
+  // ราคาสินค้า
   RealColumn get price => real()();
+
+  // URL หรือ Path รูปภาพพรีวิว
   TextColumn get imageUrl => text().nullable()();
 
-  // เวลาที่กดถูกใจ เพื่อใช้เรียงลำดับ
+  // เวลาที่กดถูกใจ
   DateTimeColumn get likedAt => dateTime().withDefault(currentDateAndTime)();
 
   @override
   Set<Column> get primaryKey => {productId};
 }
+```
+<img width="1135" height="462" alt="image" src="https://github.com/user-attachments/assets/cbf7993e-8532-4607-bf18-def9219c53d7" />
 
-/// 2. ตารางเก็บร่างประกาศขายสินค้าที่ AI แนะนำ (Draft Listings)
-class DraftListings extends Table {
-  // Primary Key ของร่างประกาศในเครื่อง (Auto Increment)
+**ตารางที่ 2: AiListingDrafts (ร่างประกาศขายสินค้าจาก AI)**
+```
+import 'package:drift/drift.dart';
+
+class AiListingDrafts extends Table {
+  // รหัส Draft ภายในเครื่อง
   IntColumn get id => integer().autoIncrement()();
 
-  // ข้อมูลเนื้อหาที่ AI สรุปให้ หรือผู้ใช้แก้ไข
+  // ชื่อประกาศขาย
   TextColumn get title => text().nullable()();
+
+  // หมวดหมู่สินค้า
   TextColumn get category => text().nullable()();
+
+  // คำบรรยายสินค้า
   TextColumn get description => text().nullable()();
 
-  // Path ของรูปภาพที่บันทึกไว้ในเครื่อง
-  TextColumn get localImagePath => text()();
+  // ที่อยู่ไฟล์รูปภาพในเครื่อง
+  TextColumn get imagePath => text()();
 
-  // เวลาสร้างและเวลาแก้ไขล่าสุด
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
-  DateTimeColumn get updatedAt => dateTime().clientDefault(() => DateTime.now())();
+  // เวลาที่แก้ไขล่าสุด
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
 ```
+
+<img width="1502" height="577" alt="image" src="https://github.com/user-attachments/assets/f280d10b-aff8-41d6-ae29-6d000678409b" />
 
 
 ### ขั้นตอนที่ 1.2: ตรวจสอบและเทียบกับหลักการในบทเรียน 🧠 คิดเอง
@@ -106,12 +120,16 @@ class DraftListings extends Table {
 
 > ✅ **Checkpoint 1.1** บันทึกคำตอบจากคำถามด้านบนทั้ง 4 ข้อ พร้อมแนบภาพหน้าจอผลลัพธ์จาก Gemini
 
-```text
-บันทึกผลลัพธ์ที่นี่
-```
+- **กำหนด Primary Key**  Gemini กำหนดคีย์หลักให้ตารางร่างประกาศ (AiListingDrafts) เป็นแบบรันเลขอัตโนมัติ (autoIncrement) ได้ถูกต้อง แต่ตารางรายการโปรด (LikedProducts) Gemini นำ productId มาตั้งเป็น Primary Key ควบไปเลย ซึ่งต่างจากที่บทเรียนแนะนำว่าควรมีคอลัมน์ id เป็น Auto-increment แยกต่างหากเพื่อเป็นคีย์หลักของตาราง
+- **ชนิดข้อมูลของราคาสินค้า** Gemini เลือกชนิดข้อมูลได้ถูกต้อง โดยเลือกใช้ RealColumn (real()()) ซึ่งตรงกับที่บทเรียนแนะนำว่าควรใช้เก็บตัวเลขที่มีทศนิยม (double)
+- **Offline-firs Gemini** แนะนำให้เก็บข้อมูลสำเนาอย่าง ชื่อ ราคา และรูปภาพ ไว้ในตารางด้วย ซึ่งถูกต้องตามหลัก Offline-first หากไม่เก็บสำเนาไว้และเก็บเพียงรหัสสินค้า เราจะไม่สามารถนำข้อมูลมาแสดงผลได้เมื่อไม่มีอินเทอร์เน็ต เพราะไม่สามารถเรียก API ได้
+- **Gemini ไม่ได้ใช้คำสั่ง .unique() กับคอลัมน์อ้างอิงสินค้า แต่ใช้วิธีกำหนดให้เป็น primaryKey แทนเพื่อไม่ให้ซ้ำ แม้จะป้องกันการซ้ำได้ แต่เพื่อให้ตรงกับแนวทางของบทเรียน ควรปรับไปใช้ .unique() ที่คอลัมน์รหัสสินค้า และใช้ Auto-increment กับคอลัมน์ id แยกกัน
+- **การป้องกันข้อมูลซ้ำ** Gemini ไม่ได้ใช้คำสั่ง .unique() กับคอลัมน์อ้างอิงสินค้า แต่ใช้วิธีกำหนดให้เป็น primaryKey แทนเพื่อไม่ให้ซ้ำ แม้จะป้องกันการซ้ำได้ แต่เพื่อให้ตรงกับแนวทางของบทเรียน ควรปรับไปใช้ .unique() ที่คอลัมน์รหัสสินค้า และใช้ Auto-increment กับคอลัมน์ id แยกกัน
+
+**ภาพหน้าจอผลลัพธ์จาก Gemini**
+<img width="1576" height="971" alt="image" src="https://github.com/user-attachments/assets/ce776173-1a43-4b0c-b0fb-1b9cf68d0cd8" />
 
 ---
-
 ## ส่วนที่ 2: ติดตั้ง Drift และประกาศตาราง
 
 ### ขั้นตอนที่ 2.1: ติดตั้งแพ็กเกจ 🔧 ทำตามขั้นตอน
