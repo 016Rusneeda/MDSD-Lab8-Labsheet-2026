@@ -445,9 +445,11 @@ https://github.com/user-attachments/assets/d9f2a9c6-bc18-4a97-afca-ac4700693462
 
 > ✅ **Checkpoint 6.1** ถ่ายภาพหน้าจอที่แสดงให้เห็นว่า Tab รายการโปรดและหน้าร่างประกาศยังคงแสดงข้อมูลได้ตามปกติแม้ไม่มีอินเทอร์เน็ตเลย (ส่วน Tab หน้าหลักที่ดึงจาก Fake Store API คาดว่าจะแสดง Error ตามปกติ เพราะยังไม่ได้ทำ Local Cache ให้หน้านั้น) 
 
-```text
-บันทึกผลลัพธ์ที่นี่
-```
+<img width="406" height="945" alt="image" src="https://github.com/user-attachments/assets/735ec6f6-59dd-49c8-a6d6-125480785ac2" />
+
+<img width="431" height="942" alt="image" src="https://github.com/user-attachments/assets/4d5143e4-59ba-44c8-9e6b-8f6d6f6b6b07" />
+
+https://github.com/user-attachments/assets/54e4238d-acec-4784-ab25-2c01c09dee86
 
 ---
 
